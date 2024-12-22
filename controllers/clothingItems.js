@@ -1,13 +1,20 @@
 const Item = require("../models/clothingItem");
+const {
+  BAD_REQUEST_STATUS,
+  NOT_FOUND_STATUS,
+  SERVER_ERROR_STATUS,
+  REQUEST_CREATED,
+  REQUEST_SUCCESS
+} = require('../utils/errors');
 
 const getItems = (req, res) => {
   Item.find({})
     .then((items) => {
-      res.status(200).send(items);
+      res.status(REQUEST_SUCCESS).send(items);
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({message: err.message});
+      return res.status(SERVER_ERROR_STATUS).send({message: err.message});
     });
 }
 
@@ -17,16 +24,15 @@ const createItem = (req, res) => {
 
     Item.create({ name, weather, imageUrl, owner: userId })
     .then((item) => {
-      res.status(201).send(item);
+      res.status(REQUEST_CREATED).send(item);
     })
     .catch((err) => {
       console.error(err);
-      console.log(err.name);
       if (err.name === "ValidationError") {
-        return res.status(400).send({message: err.message});
-      } else {
-        return res.status(500).send({message: err.message});
-        }
+        return res.status(BAD_REQUEST_STATUS).send({message: err.message});
+      }
+      return res.status(SERVER_ERROR_STATUS).send({message: err.message});
+
     });
 }
 
@@ -36,17 +42,17 @@ const deleteItem = (req, res) => {
   Item.findByIdAndDelete(itemId.id)
   .orFail()
   .then(() => {
-    res.status(200).send({})
+    res.status(REQUEST_SUCCESS).send({})
   })
   .catch((err) => {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).send({message: err.message});
+      return res.status(NOT_FOUND_STATUS).send({message: err.message});
     } else if (err.name === "CastError") {
-      return res.status(400).send({message: err.message})
-    } else {
-      return res.status(500).send({message: err.message});
+      return res.status(BAD_REQUEST_STATUS).send({message: err.message})
     }
+    return res.status(SERVER_ERROR_STATUS).send({message: err.message});
+
   })
 }
 
@@ -54,17 +60,17 @@ const likeItem = (req, res) => {
   Item.findByIdAndUpdate( req.params.itemId, { $addToSet: { likes: req.user._id}}, { new: true })
   .orFail()
   .then((item) => {
-    res.status(200).send(item);
+    res.status(REQUEST_SUCCESS).send(item);
   })
   .catch((err) => {
     console.error(err)
 
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).send({message: err.message});
+      return res.status(NOT_FOUND_STATUS).send({message: err.message});
     } else if (err.name === "CastError") {
-      return res.status(400).send({message: err.message});
+      return res.status(BAD_REQUEST_STATUS).send({message: err.message});
     }
-
+    return res.status(SERVER_ERROR_STATUS).send({message: err.message});
   });
 }
 
@@ -73,17 +79,17 @@ const unlikeItem = (req, res) => {
   Item.findByIdAndUpdate( req.params.itemId, { $pull: { likes: req.user._id}}, { new: true })
   .orFail()
   .then((item) => {
-    res.status(200).send(item);
+    res.status(REQUEST_SUCCESS).send(item);
   })
   .catch((err) => {
     console.error(err)
 
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).send({message: err.message});
+      return res.status(NOT_FOUND_STATUS).send({message: err.message});
     } else if (err.name === "CastError") {
-      return res.status(400).send({message: err.message});
+      return res.status(BAD_REQUEST_STATUS).send({message: err.message});
     }
-
+    return res.status(SERVER_ERROR_STATUS).send({message: err.message});
   });
 }
 
