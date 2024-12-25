@@ -5,7 +5,7 @@ router.post("/", createItem);
 
 router.get("/", getItems);
 
-router.delete("/:id", deleteItem); // Postman test dictates delete path is /:id when project notes say /:itemId
+router.delete("/:itemId", deleteItem); // Postman test dictates delete path is /:id when project notes say /:itemId
 
 router.put("/:itemId/likes", likeItem);
 
