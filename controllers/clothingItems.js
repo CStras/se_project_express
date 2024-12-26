@@ -39,10 +39,10 @@ const createItem = (req, res) => {
 const deleteItem = (req, res) => {
   const {itemId} = req.params;
 
-  Item.findByIdAndDelete(itemId.id)
+  Item.findByIdAndDelete(itemId)
   .orFail()
   .then(() => {
-    res.status(REQUEST_SUCCESS).send("Deleted")
+    res.status(REQUEST_SUCCESS).send({message: "Deleted"})
   })
   .catch((err) => {
     console.error(err);
