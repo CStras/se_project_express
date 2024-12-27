@@ -1,4 +1,4 @@
-import { NOT_FOUND_STATUS } from "../utils/errors";
+const { NOT_FOUND_STATUS } = require("../utils/errors");
 
 const router = require("express").Router();
 const userRouter = require("./users");
