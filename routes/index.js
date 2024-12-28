@@ -1,8 +1,7 @@
-const { NOT_FOUND_STATUS } = require("../utils/errors");
-
 const router = require("express").Router();
 const userRouter = require("./users");
 const itemRouter = require("./clothingItems");
+const { NOT_FOUND_STATUS } = require("../utils/errors");
 
 router.use("/users", userRouter);
 router.use("/items", itemRouter);
