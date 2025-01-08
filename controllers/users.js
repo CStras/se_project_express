@@ -71,8 +71,8 @@ const login = (req, res, next) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const { userId } = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => {
@@ -91,4 +91,35 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, login };
+const updateProfile = (req, res) => {
+  const { name, email } = req.body;
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, email },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((user) => {
+      res.status(REQUEST_SUCCESS).send(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_STATUS)
+          .send({ message: "Could not find the profile" });
+      }
+
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST_STATUS).send({ message: err.message });
+      }
+
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST_STATUS).send({ message: "Invalid data" });
+      }
+      return res.status(SERVER_ERROR_STATUS).send({ message: err.message });
+    });
+};
+
+module.exports = { getUsers, createUser, getCurrentUser, login };
