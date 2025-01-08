@@ -3,9 +3,12 @@ const {
   BAD_REQUEST_STATUS,
   NOT_FOUND_STATUS,
   SERVER_ERROR_STATUS,
-  REQUEST_CREATED,
+  UNATHORIZED,
   REQUEST_SUCCESS,
 } = require("../utils/errors");
+const { JWT_SECRET } = require("../utils/config");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const getUsers = (req, res) => {
   User.find({})
@@ -53,7 +56,20 @@ const createUser = (req, res, next) => {
     .catch(next);
 };
 
-const login = (req, res, next) => {};
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ token });
+    })
+    .catch(() => {
+      res.status(UNATHORIZED).send({ message: "Invalid email or password" });
+    });
+};
 
 const getUser = (req, res) => {
   const { userId } = req.params;
@@ -75,4 +91,4 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser };
+module.exports = { getUsers, createUser, getUser, login };
