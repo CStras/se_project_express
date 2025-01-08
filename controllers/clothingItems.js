@@ -14,7 +14,7 @@ const getItems = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(SERVER_ERROR_STATUS).send({message: err.message});
+      return res.status(SERVER_ERROR_STATUS).send("An error has occurred on the server");
     });
 }
 
@@ -37,18 +37,20 @@ const createItem = (req, res) => {
 }
 
 const deleteItem = (req, res) => {
-  const itemId = req.params;
+  const {itemId} = req.params;
 
-  Item.findByIdAndDelete(itemId.id)
+  Item.findByIdAndDelete(itemId)
   .orFail()
   .then(() => {
-    res.status(REQUEST_SUCCESS).send({})
+    res.status(REQUEST_SUCCESS).send({message: "Deleted"})
   })
   .catch((err) => {
     console.error(err);
     if (err.name === "DocumentNotFoundError") {
       return res.status(NOT_FOUND_STATUS).send({message: err.message});
-    } else if (err.name === "CastError") {
+    }
+
+    if (err.name === "CastError") {
       return res.status(BAD_REQUEST_STATUS).send({message: err.message})
     }
     return res.status(SERVER_ERROR_STATUS).send({message: err.message});
@@ -67,7 +69,9 @@ const likeItem = (req, res) => {
 
     if (err.name === "DocumentNotFoundError") {
       return res.status(NOT_FOUND_STATUS).send({message: err.message});
-    } else if (err.name === "CastError") {
+    }
+
+    if (err.name === "CastError") {
       return res.status(BAD_REQUEST_STATUS).send({message: err.message});
     }
     return res.status(SERVER_ERROR_STATUS).send({message: err.message});
@@ -86,7 +90,9 @@ const unlikeItem = (req, res) => {
 
     if (err.name === "DocumentNotFoundError") {
       return res.status(NOT_FOUND_STATUS).send({message: err.message});
-    } else if (err.name === "CastError") {
+    }
+
+    if (err.name === "CastError") {
       return res.status(BAD_REQUEST_STATUS).send({message: err.message});
     }
     return res.status(SERVER_ERROR_STATUS).send({message: err.message});
