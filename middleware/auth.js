@@ -11,11 +11,12 @@ const authorize = (req, res, next) => {
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload;
-    next();
   } catch (err) {
     return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
   }
+
+  req.user = payload;
+  return next();
 };
 
 module.exports = { authorize };

@@ -3,8 +3,8 @@ const {
   BAD_REQUEST_STATUS,
   NOT_FOUND_STATUS,
   SERVER_ERROR_STATUS,
-  UNATHORIZED,
   REQUEST_SUCCESS,
+  CONFLICT,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 const jwt = require("jsonwebtoken");
@@ -28,7 +28,7 @@ const createUser = (req, res, next) => {
     .then((user) => {
       if (user) {
         return res
-          .status(BAD_REQUEST_STATUS)
+          .status(CONFLICT)
           .send({ message: "This email is already in use." });
       }
       return bcrypt.hash(password, 10).then((hash) => {
@@ -64,16 +64,18 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
+
       res.send({ token });
     })
     .catch(() => {
-      res.status(UNATHORIZED).send({ message: "Invalid email or password" });
+      res
+        .status(BAD_REQUEST_STATUS)
+        .send({ message: "Invalid email or password" });
     });
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user._id;
-  User.findById(userId)
+  User.findById(req?.user?._id)
     .orFail()
     .then((user) => {
       res.status(REQUEST_SUCCESS).send(user);
@@ -92,11 +94,12 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateProfile = (req, res) => {
-  const { name, email } = req.body;
+  const { name, avatar } = req.body;
+  const userId = req.user._id;
 
   User.findByIdAndUpdate(
     userId,
-    { name, email },
+    { name, avatar },
     { new: true, runValidators: true }
   )
     .orFail()
@@ -122,4 +125,4 @@ const updateProfile = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, login };
+module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };

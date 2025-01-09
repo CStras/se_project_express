@@ -1,10 +1,11 @@
 const BAD_REQUEST_STATUS = 400;
+const UNATHORIZED = 401;
+const FORBIDDEN = 403;
 const NOT_FOUND_STATUS = 404;
+const CONFLICT = 409;
 const SERVER_ERROR_STATUS = 500;
 const REQUEST_SUCCESS = 200;
 const REQUEST_CREATED = 201;
-const UNATHORIZED = 401;
-const FORBIDDEN = 403;
 
 module.exports = {
   BAD_REQUEST_STATUS,
@@ -14,4 +15,5 @@ module.exports = {
   REQUEST_SUCCESS,
   UNATHORIZED,
   FORBIDDEN,
+  CONFLICT,
 };

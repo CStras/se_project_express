@@ -23,9 +23,9 @@ const getItems = (req, res) => {
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const userId = req.user;
-
-  Item.create({ name, weather, imageUrl, owner: userId })
+  const owner = req.user._id;
+  console.log(req.user);
+  Item.create({ name, weather, imageUrl, owner })
     .then((item) => {
       res.status(REQUEST_CREATED).send(item);
     })
@@ -51,7 +51,7 @@ const deleteItem = (req, res) => {
   Item.findByIdAndDelete(itemId)
     .orFail()
     .then(() => {
-      res.status(REQUEST_SUCCESS).send({ message: "Deleted" });
+      res.status(REQUEST_SUCCESS).send({ message: "Deleted" }); //??? why does the postman test require this to be 403?
     })
     .catch((err) => {
       console.error(err);
