@@ -13,38 +13,44 @@ const { JWT_SECRET } = require("../utils/config");
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  User.findOne({ email }).then((user) => {
-    if (!email || !password) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .send({ message: "This email is already in use." });
-    }
-    if (email === user?.email) {
-      return res
-        .status(CONFLICT)
-        .send({ message: "This email is already in use." });
-    }
-    return bcrypt.hash(password, 10).then((hash) => {
-      User.create({ name, avatar, email, password: hash })
-        .then((data) => {
-          res.setHeader("Content-Type", "application/json").send({
-            name: data.name,
-            email: data.email,
-            avatar: data.avatar,
-          });
-        })
-        .catch((err) => {
-          if (err.name === "ValidationError") {
+  User.findOne({ email })
+    .then((user) => {
+      if (!email || !password) {
+        return res
+          .status(BAD_REQUEST_STATUS)
+          .send({ message: "This email is already in use." });
+      }
+      if (email === user?.email) {
+        return res
+          .status(CONFLICT)
+          .send({ message: "This email is already in use." });
+      }
+      return bcrypt.hash(password, 10).then((hash) => {
+        User.create({ name, avatar, email, password: hash })
+          .then((data) => {
+            res.setHeader("Content-Type", "application/json").send({
+              name: data.name,
+              email: data.email,
+              avatar: data.avatar,
+            });
+          })
+          .catch((err) => {
+            if (err.name === "ValidationError") {
+              return res
+                .status(BAD_REQUEST_STATUS)
+                .send({ message: "Invalid format" });
+            }
             return res
-              .status(BAD_REQUEST_STATUS)
-              .send({ message: "Invalid format" });
-          }
-          return res
-            .status(SERVER_ERROR_STATUS)
-            .send({ message: "Invalid data" });
-        });
+              .status(SERVER_ERROR_STATUS)
+              .send({ message: "Invalid data" });
+          });
+      });
+    })
+    .catch((err) => {
+      return res
+        .status(SERVER_ERROR_STATUS)
+        .send({ message: "An error has occured on the server." });
     });
-  });
 };
 
 const login = (req, res) => {
@@ -70,9 +76,9 @@ const login = (req, res) => {
           .status(UNAUTHORIZED)
           .send({ message: "Unable to find user" });
       }
-      res
-        .status(BAD_REQUEST_STATUS)
-        .send({ message: "Email and password are required" });
+      return res
+        .status(SERVER_ERROR_STATUS)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
