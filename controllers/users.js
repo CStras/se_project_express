@@ -47,6 +47,7 @@ const createUser = (req, res) => {
       });
     })
     .catch((err) => {
+      console.log(err);
       return res
         .status(SERVER_ERROR_STATUS)
         .send({ message: "An error has occured on the server." });
