@@ -8,6 +8,7 @@ const authorize = (req, res, next) => {
     return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
   }
   const token = authorization.replace("Bearer ", "");
+  console.log(token);
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
@@ -19,4 +20,4 @@ const authorize = (req, res, next) => {
   return next();
 };
 
-module.exports = { authorize };
+module.exports = authorize;
