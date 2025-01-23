@@ -69,7 +69,7 @@ const login = (req, res) => {
         expiresIn: "7d",
       });
 
-      res.send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       if (err.message.includes("Incorrect email or password")) {
