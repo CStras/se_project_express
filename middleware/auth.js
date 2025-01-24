@@ -8,14 +8,12 @@ const authorize = (req, res, next) => {
     return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
   }
   const token = authorization.replace("Bearer ", "");
-  console.log(token);
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
   }
-
   req.user = payload;
   return next();
 };

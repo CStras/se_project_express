@@ -3,13 +3,11 @@ const userRouter = require("./users");
 const itemRouter = require("./clothingItems");
 const { createUser, login } = require("../controllers/users");
 const { NOT_FOUND_STATUS } = require("../utils/errors");
-const authorize = require("../middleware/auth");
 
 router.post("/signup", createUser);
 router.post("/signin", login);
 
 router.use("/items", itemRouter);
-//router.use("/", authorize);
 router.use("/users", userRouter);
 
 router.use((req, res) => {
