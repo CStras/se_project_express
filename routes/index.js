@@ -2,18 +2,20 @@ const router = require("express").Router();
 const userRouter = require("./users");
 const itemRouter = require("./clothingItems");
 const { createUser, login } = require("../controllers/users");
-const { NOT_FOUND_STATUS } = require("../utils/errors");
+const { NotFoundError } = require("../contructors/not-found-err");
+const {
+  validateRegisterBody,
+  validateLoginBody,
+} = require("../middleware/validation");
 
-router.post("/signup", createUser);
-router.post("/signin", login);
+router.post("/signup", validateRegisterBody, createUser);
+router.post("/signin", validateLoginBody, login);
 
 router.use("/items", itemRouter);
 router.use("/users", userRouter);
 
-router.use((req, res) => {
-  res
-    .status(NOT_FOUND_STATUS)
-    .send({ message: "Sorry, that link doesn't exist!" });
-});
+router.use((req, res, next) =>
+  next(new NotFoundError("Requested resource not found"))
+);
 
 module.exports = router;

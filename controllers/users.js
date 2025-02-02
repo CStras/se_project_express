@@ -3,16 +3,9 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const BadRequestError = require("../contructors/bad-request-err");
 const ConflictError = require("../contructors/conflict-err");
-const ForbiddenError = require("../contructors/forbidden-err");
 const NotFoundError = require("../contructors/not-found-err");
 const UnauthorizedError = require("../contructors/unauth-err");
-const {
-  BAD_REQUEST_STATUS,
-  SERVER_ERROR_STATUS,
-  NOT_FOUND_STATUS,
-  UNAUTHORIZED,
-  REQUEST_CREATED,
-} = require("../utils/errors");
+const { REQUEST_CREATED } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
 const createUser = (req, res, next) => {
@@ -22,7 +15,7 @@ const createUser = (req, res, next) => {
     return next(new BadRequestError("Email is already in use."));
   }
 
-  User.findOne({ email })
+  return User.findOne({ email })
     .then((user) => {
       if (user) {
         throw new ConflictError("Email is already in use.");
@@ -41,7 +34,6 @@ const createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid data"));
       }
@@ -77,7 +69,7 @@ const login = (req, res, next) => {
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req?.user?._id)
     .orFail()
     .then((user) => {
@@ -95,7 +87,7 @@ const getCurrentUser = (req, res) => {
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
 
